@@ -1,0 +1,11 @@
+# Vim temporary files
+*~
+*.swp
+
+# YCM vim plugin
+.ycm_extra_conf.py
+.ycm_extra_conf.pyc
+
+# Binary
+/build
+/bin
