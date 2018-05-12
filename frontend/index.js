@@ -20,7 +20,7 @@ function genUrl(param) {
 
 angular.module('appIndex', [])
     .controller('IndexController', ['$scope', ($scope) => {
-        param = {
+        var param = {
             minLng: backend.getMinLongitude(),
             maxLng: backend.getMaxLongitude(),
             minLat: backend.getMinLatitude(),

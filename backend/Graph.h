@@ -19,14 +19,13 @@ private:
     {
         int y; /// Node ID
         int d; /// Distance
-        Edge *next;
     };
 
     struct Node
     {
         double x, y, z; /// Coordinate in the unit ball
-        Edge *out; /// Outcoming edges in a linked list
-        Taxi *taxis; /// Taxis in a linked list
+        std::vector<Edge> out; /// Outcoming edges
+        std::vector<Taxi> taxis;
 
         Node() {}
         Node(double longitude, double latitude);
@@ -38,7 +37,6 @@ private:
     };
 
     std::vector<Node> nodes;
-    std::vector<Edge> edges;
     double minLongitude, maxLongitude, minLatitude, maxLatitude;
 
     static double directDist(const Node &a, const Node &b);
@@ -57,7 +55,6 @@ public:
 };
 
 inline Graph::Node::Node(double longitude, double latitude)
-    : out(NULL)
 {
     double phi = longitude / 180 * PI;
     double theta = (90 - latitude) / 180 * PI;
