@@ -8,4 +8,4 @@
 
 # Binary
 /build
-/bin
+/node_modules

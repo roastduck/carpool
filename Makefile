@@ -3,7 +3,9 @@ buildtype ?= Release
 CXX = g++
 AR = ar
 GYP = node-gyp
+NPM = npm
 MKDIR = mkdir
+LN = ln
 RM = rm
 
 ifneq ($(buildtype), Release)
@@ -23,13 +25,16 @@ else
 endif
 
 CXXSRC_DIR = src/backend
+NODESRC_DIR = src/frontend
 BUILD_DIR = build/$(buildtype)
 CXXSRC = $(filter-out backend.cpp, $(notdir $(wildcard $(CXXSRC_DIR)/*.cpp)))
 CXXOBJ = $(patsubst %.cpp, %.o, $(CXXSRC))
 LIBBACKEND = $(BUILD_DIR)/libbackend.a
 BACKEND = $(BUILD_DIR)/backend.node
+FRONTEND = $(NODESRC_DIR)
+ELECTRON = node_modules/.bin/electron
 
-all: $(BACKEND)
+all: $(BACKEND) $(FRONTEND) | node_modules
 
 $(BUILD_DIR):
 	$(MKDIR) -p $@
@@ -48,8 +53,18 @@ build/Makefile: binding.gyp
 $(BACKEND): build/Makefile src/backend/backend.cpp $(LIBBACKEND)
 	$(GYP) $(GYPFLAGS) build
 
+node_modules: $(NODESRC_DIR)/package.json
+	$(NPM) install $(NODESRC_DIR)
+
+run: all
+	$(LN) -f $(BACKEND) build/backend.node
+	$(ELECTRON) $(FRONTEND)
+
 clean:
 	$(RM) -r build
+	$(RM) -r node_modules
 
-.PHONY: all clean
+.PHONY: all run clean
+
+.DELETE_ON_ERROR: $(ELECTRON)
 
