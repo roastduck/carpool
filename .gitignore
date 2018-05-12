@@ -9,3 +9,6 @@
 # Binary
 /backend/build
 /node_modules
+
+# Data
+/data

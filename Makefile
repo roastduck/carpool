@@ -3,6 +3,7 @@ build:
 	./node_modules/.bin/electron-rebuild
 
 rebuild:
+	npm install ./backend
 	./node_modules/.bin/electron-rebuild
 
 run:

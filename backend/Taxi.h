@@ -13,9 +13,14 @@ private:
     std::vector<int> targets;
 
 public:
-    static void input(Graph &graph, FILE *f);
+    Taxi *next;
 
+    Taxi() : next(NULL) {}
     void verify(int pickNode, int dist, std::vector<Result> &results) const;
+
+    static std::vector<Taxi> taxis;
+
+    static void input(Graph &graph, FILE *f);
 };
 
 #endif // TAXI_H_
