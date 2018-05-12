@@ -7,5 +7,5 @@
 .ycm_extra_conf.pyc
 
 # Binary
-/build
+/backend/build
 /node_modules

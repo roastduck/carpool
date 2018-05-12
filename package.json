@@ -1,0 +1,12 @@
+{
+  "name": "carpool",
+  "version": "0.0.0",
+  "main": "frontend/main.js",
+  "dependencies": {
+    "angular": "^1.7.0",
+    "bootstrap": "^3.3.7",
+    "carpool-backend": "file:backend",
+    "electron": "^2.0.0",
+    "jquery": "^3.3.1"
+  }
+}

@@ -1,6 +1,6 @@
 "use strict"
 
-const backend = require("../../build/backend");
+const backend = require("../node_modules/carpool-backend");
 
 angular.module('appIndex', [])
     .controller('IndexController', ['$scope', ($scope) => {
