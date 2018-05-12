@@ -27,6 +27,7 @@ private:
         std::vector<Edge> out; /// Outcoming edges
         std::vector<Taxi> taxis;
 
+        Node() {}
         Node(double longitude, double latitude);
     };
 

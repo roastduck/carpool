@@ -22,7 +22,7 @@ void Graph::input(FILE *nodeFile, FILE *edgeFile)
     }
 }
 
-static struct Weighted { int w, x; };
+struct Weighted { int w, x; };
 static bool heapCmp(const Weighted &lhs, const Weighted &rhs) { return lhs.w > rhs.w; }
 
 std::vector<Result> Graph::solve(int queryNodeId) const
