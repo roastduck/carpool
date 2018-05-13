@@ -39,6 +39,8 @@ private:
     std::vector<Node> nodes;
     double minLongitude, maxLongitude, minLatitude, maxLatitude;
 
+    int nearestNode(double lng, double lat) const;
+
     static double directDist(const Node &a, const Node &b);
 
 public:
@@ -46,8 +48,8 @@ public:
 
     Node &getNode(int id);
     void input(FILE *nodeFile, FILE *edgeFile);
-    Result solve(int queryNodeId) const;
-    Result solve(double lng, double lat) const;
+    Result solve(int stId, int enId) const;
+    Result solve(double lngSt, double latSt, double lngEn, double latEn) const;
 
     double getMinLongitude() const { return minLongitude; }
     double getMaxLongitude() const { return maxLongitude; }

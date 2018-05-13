@@ -14,14 +14,14 @@ typedef std::vector<Point> Path;
 
 struct Candidate
 {
-    Point taxi, newTarget;
+    Point taxi;
     std::vector<Point> targets;
     Path oldPath, newPath;
 };
 
 struct Result
 {
-    Point query;
+    Point depart, dest;
     std::vector<Candidate> candidates;
 };
 

@@ -2,6 +2,7 @@
     <head>
         <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
         <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="./index.css" />
 		<script>
             document.write("<script src=\"http://api.map.baidu.com/api?v=3.0&ak=" + require("./api-key.js") + "\"><\/script>");
         </script>
@@ -17,7 +18,14 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-xs-12 well" style="height:75%">
-                    <div id="map" style="height:100%"></div>
+                    <div id="map" class="baidu-maps" style="height:100%"></div>
+                </div>
+            <div>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="alert alert-info">
+                        <strong>{{message[state]}}</strong>
+                    </div>
                 </div>
             <div>
         </div>

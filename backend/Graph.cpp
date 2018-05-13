@@ -6,6 +6,21 @@ Graph::Graph()
       minLatitude(INFINITY), maxLatitude(-INFINITY)
 {}
 
+int Graph::nearestNode(double lng, double lat) const
+{
+    // Slow implementation: Can be optimized using a tree
+    Node qry(lng, lat);
+    int id = -1;
+    double dist = INFINITY;
+    for (int i = 0; i < int(nodes.size()); i++)
+    {
+        double _dist = directDist(nodes[i], qry);
+        if (_dist < dist)
+            id = i, dist = _dist;
+    }
+    return id;
+}
+
 void Graph::input(FILE *nodeFile, FILE *edgeFile)
 {
     int n, m;
@@ -37,22 +52,23 @@ void Graph::input(FILE *nodeFile, FILE *edgeFile)
 struct Weighted { int w, x; };
 static bool heapCmp(const Weighted &lhs, const Weighted &rhs) { return lhs.w > rhs.w; }
 
-Result Graph::solve(int queryNodeId) const
+Result Graph::solve(int stId, int enId) const
 {
-    printf("[DEBUG] Query node %d (%f, %f)\n", queryNodeId, nodes[queryNodeId].lng, nodes[queryNodeId].lat);
+    printf("[DEBUG] Query node %d (%f, %f)\n", stId, nodes[stId].lng, nodes[stId].lat);
 
     // Dijkstra, because we want nearer node to come out sooner
 
     std::vector<Weighted> heap;
     heap.reserve(nodes.size());
-    heap.push_back((Weighted){0, queryNodeId});
+    heap.push_back((Weighted){0, stId});
 
     std::vector<Trace> trace;
     trace.resize(nodes.size(), (Trace){DIST_THRES + 1, -1});
-    trace[queryNodeId].dist = 0;
+    trace[stId].dist = 0;
 
     Result ret;
-    ret.query = (Point){nodes[queryNodeId].lng, nodes[queryNodeId].lat};
+    ret.depart = (Point){nodes[stId].lng, nodes[stId].lat};
+    ret.dest = (Point){nodes[enId].lng, nodes[enId].lat};
     ret.candidates.reserve(RESULT_NUM);
 
     while (!heap.empty())
@@ -80,18 +96,8 @@ Result Graph::solve(int queryNodeId) const
     return ret;
 }
 
-Result Graph::solve(double lng, double lat) const
+Result Graph::solve(double lngSt, double latSt, double lngEn, double latEn) const
 {
-    // Slow implementation: Can be optimized using a tree
-    Node qry(lng, lat);
-    int id = -1;
-    double dist = INFINITY;
-    for (int i = 0; i < int(nodes.size()); i++)
-    {
-        double _dist = directDist(nodes[i], qry);
-        if (_dist < dist)
-            id = i, dist = _dist;
-    }
-    return solve(id);
+    return solve(nearestNode(lngSt, latSt), nearestNode(lngEn, latEn));
 }
 

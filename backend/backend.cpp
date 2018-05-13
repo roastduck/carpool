@@ -56,16 +56,18 @@ namespace ex
 
     void query(const FunctionCallbackInfo<Value> &args)
     {
-        if (!checkArgs(args, 2))
+        if (!checkArgs(args, 4))
             return;
         Isolate* isolate = args.GetIsolate();
 
-        double lng = args[0]->NumberValue(), lat = args[1]->NumberValue();
-        printf("[DEBUG] Query GCJ coordinate (%f, %f)\n", lng, lat);
+        double lngSt = args[0]->NumberValue(), latSt = args[1]->NumberValue();
+        double lngEn = args[2]->NumberValue(), latEn = args[3]->NumberValue();
+        printf("[DEBUG] Query GCJ coordinate (%f, %f) -> (%f, %f)\n", lngSt, latSt, lngEn, latEn);
 
-        Result res = graph.solve(lng, lat);
+        Result res = graph.solve(lngSt, latSt, lngEn, latEn);
         Local<Object> ret = Object::New(isolate);
-        ret->Set(String::NewFromUtf8(isolate, "query"), getPoint(isolate, res.query));
+        ret->Set(String::NewFromUtf8(isolate, "depart"), getPoint(isolate, res.depart));
+        ret->Set(String::NewFromUtf8(isolate, "dest"), getPoint(isolate, res.dest));
 
         args.GetReturnValue().Set(ret);
     }

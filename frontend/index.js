@@ -22,14 +22,24 @@ angular.module('appIndex', [])
 
         const map = new BMap.Map("map");
 
-        function addMarks(_pts) {
+        function addMarks(_pts, msgs, callback) {
             getPoints(_pts, (pts) => {
                 for (var i in pts) {
-                    const mark = new BMap.Marker(pts[i], {});
+                    const mark = new BMap.Marker(pts[i]);
                     map.addOverlay(mark);
+                    if (i < msgs.length)
+                        mark.setLabel(new BMap.Label(msgs[i], {offset: new BMap.Size(20, -10)}));
                 }
+                callback();
             });
         }
+
+        const INIT = 0, EXT = 1;
+        $scope.state = INIT;
+        $scope.message = [
+            "Click on the map for departure point",
+            "Click on the map for destination point"
+        ];
 
         const minLng = backend.getMinLongitude();
         const maxLng = backend.getMaxLongitude();
@@ -38,17 +48,39 @@ angular.module('appIndex', [])
         getPoints([{x: (minLng + maxLng) / 2, y: (minLat + maxLat) / 2}], (pts) => {
             map.centerAndZoom(pts[0], 9);
             map.enableScrollWheelZoom();
+            const query = {};
             map.addEventListener("click", (e) => {
-                convertor.translate([e.point], BD_COORD, GCJ_COORD, (pts) => {
-                    if (pts.status != 0)
-                    {
-                        console.log("Error: Cannot convert coordinate (Baidu -> GCJ)");
-                        return;
-                    }
-                    const result = backend.query(pts.points[0].lng, pts.points[0].lat);
+                switch ($scope.state) {
+                case INIT:
+                    query.st = e.point;
                     map.clearOverlays();
-                    addMarks([result.query]);
-                });
+                    const mark = new BMap.Marker(e.point);
+                    map.addOverlay(mark);
+                    $scope.state = EXT;
+                    $scope.$apply();
+                    break;
+                case EXT:
+                    query.en = e.point;
+                    convertor.translate([query.st, query.en], BD_COORD, GCJ_COORD, (pts) => {
+                        if (pts.status != 0)
+                        {
+                            console.log("Error: Cannot convert coordinate (Baidu -> GCJ)");
+                            return;
+                        }
+                        const result = backend.query(
+                            pts.points[0].lng, pts.points[0].lat,
+                            pts.points[1].lng, pts.points[1].lat
+                        );
+                        map.clearOverlays();
+                        addMarks([result.depart, result.dest], ["From", "To"], () => {
+                            $scope.state = INIT;
+                            $scope.$apply();
+                        });
+                    });
+                    break;
+                default:
+                    console.log("Error: Invalid state");
+                }
             });
         });
     }]);
