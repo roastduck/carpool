@@ -1,13 +1,28 @@
 #ifndef RESULT_H_
 #define RESULT_H_
 
-#include <array>
+#include <vector>
 
 const int RESULT_NUM = 5;
 
-class Result
+struct Point
 {
+    double x, y;
+};
 
+typedef std::vector<Point> Path;
+
+struct Candidate
+{
+    Point taxi, newTarget;
+    std::vector<Point> targets;
+    Path oldPath, newPath;
+};
+
+struct Result
+{
+    Point query;
+    std::vector<Candidate> candidates;
 };
 
 #endif // RESULT_H_

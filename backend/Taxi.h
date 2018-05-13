@@ -15,7 +15,7 @@ private:
 public:
     static void input(Graph &graph, FILE *f);
 
-    void verify(int pickNode, int dist, std::vector<Result> &results) const;
+    void verify(int pickNode, int dist, std::vector<Candidate> &results) const;
 };
 
 #endif // TAXI_H_

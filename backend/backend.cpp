@@ -2,13 +2,15 @@
 #include <node.h>
 #include "Taxi.h"
 #include "Graph.h"
+#include "Result.h"
+#include "Convert.h"
 
 const char *NODE_FILE = "data/road.cnode";
 const char *EDGE_FILE = "data/road.nedge";
 const char *TAXI_FILE = "data/car.txt";
 
 #define F_NUM(name, callback) \
-    void name(const FunctionCallbackInfo<Value>& args) \
+    void name(const FunctionCallbackInfo<Value> &args) \
     { \
         Isolate* isolate = args.GetIsolate(); \
         args.GetReturnValue().Set(Number::New(isolate, (callback)())); \
@@ -23,13 +25,54 @@ namespace ex
     using v8::String;
     using v8::Value;
     using v8::Number;
+    using v8::Exception;
 
     Graph graph;
+
+    bool checkArgs(const FunctionCallbackInfo<Value> &args, int num)
+    {
+        Isolate* isolate = args.GetIsolate();
+        if (args.Length() != num)
+        {
+            isolate->ThrowException(Exception::TypeError(
+                String::NewFromUtf8(isolate, "query: Wrong number of arguments")
+            ));
+            return false;
+        }
+        return true;
+    }
+
+    Local<Object> getPoint(Isolate *isolate, const Point &ptr)
+    {
+        Local<Object> obj = Object::New(isolate);
+        obj->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, ptr.x));
+        obj->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, ptr.y));
+        return obj;
+    }
 
     F_NUM(getMinLongitude, graph.getMinLongitude)
     F_NUM(getMaxLongitude, graph.getMaxLongitude)
     F_NUM(getMinLatitude, graph.getMinLatitude)
     F_NUM(getMaxLatitude, graph.getMaxLatitude)
+
+    void query(const FunctionCallbackInfo<Value> &args)
+    {
+        if (!checkArgs(args, 2))
+            return;
+        Isolate* isolate = args.GetIsolate();
+
+        double gcjLng = args[0]->NumberValue(), gcjLat = args[1]->NumberValue();
+        printf("[DEBUG] Query GCJ coordinate (%f, %f)\n", gcjLng, gcjLat);
+        double lng, lat;
+        Convert::decode(gcjLng, gcjLat, lng, lat);
+        printf("[DEBUG] Query true coordinate (%f, %f)\n", lng, lat);
+
+        Result res = graph.solve(lng, lat);
+        Local<Object> ret = Object::New(isolate);
+        ret->Set(String::NewFromUtf8(isolate, "query"), getPoint(isolate, res.query));
+
+        args.GetReturnValue().Set(ret);
+    }
 
     void init(Local<Object> exports)
     {
@@ -60,6 +103,7 @@ namespace ex
         NODE_SET_METHOD(exports, "getMaxLongitude", getMaxLongitude);
         NODE_SET_METHOD(exports, "getMinLatitude", getMinLatitude);
         NODE_SET_METHOD(exports, "getMaxLatitude", getMaxLatitude);
+        NODE_SET_METHOD(exports, "query", query);
     }
 
     NODE_MODULE(NODE_GYP_MODULE_NAME, init)

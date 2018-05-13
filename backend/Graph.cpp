@@ -37,8 +37,10 @@ void Graph::input(FILE *nodeFile, FILE *edgeFile)
 struct Weighted { int w, x; };
 static bool heapCmp(const Weighted &lhs, const Weighted &rhs) { return lhs.w > rhs.w; }
 
-std::vector<Result> Graph::solve(int queryNodeId) const
+Result Graph::solve(int queryNodeId) const
 {
+    printf("[DEBUG] Query node %d (%f, %f)\n", queryNodeId, nodes[queryNodeId].lng, nodes[queryNodeId].lat);
+
     // Dijkstra, because we want nearer node to come out sooner
 
     std::vector<Weighted> heap;
@@ -49,8 +51,9 @@ std::vector<Result> Graph::solve(int queryNodeId) const
     trace.resize(nodes.size(), (Trace){DIST_THRES + 1, -1});
     trace[queryNodeId].dist = 0;
 
-    std::vector<Result> ret;
-    ret.reserve(RESULT_NUM);
+    Result ret;
+    ret.query = (Point){nodes[queryNodeId].lng, nodes[queryNodeId].lat};
+    ret.candidates.reserve(RESULT_NUM);
 
     while (!heap.empty())
     {
@@ -61,8 +64,8 @@ std::vector<Result> Graph::solve(int queryNodeId) const
 
         for (const Taxi &taxi : nodes[x].taxis)
         {
-            taxi.verify(x, w, ret);
-            if (ret.size() >= RESULT_NUM)
+            taxi.verify(x, w, ret.candidates);
+            if (ret.candidates.size() >= RESULT_NUM)
                 return ret;
         }
 
@@ -75,5 +78,20 @@ std::vector<Result> Graph::solve(int queryNodeId) const
     }
 
     return ret;
+}
+
+Result Graph::solve(double lng, double lat) const
+{
+    // Slow implementation: Can be optimized using a tree
+    Node qry(lng, lat);
+    int id = -1;
+    double dist = INFINITY;
+    for (int i = 0; i < int(nodes.size()); i++)
+    {
+        double _dist = directDist(nodes[i], qry);
+        if (_dist < dist)
+            id = i, dist = _dist;
+    }
+    return solve(id);
 }
 

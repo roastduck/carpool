@@ -23,7 +23,7 @@ private:
 
     struct Node
     {
-        double x, y, z; /// Coordinate in the unit ball
+        double lng, lat, x, y, z; /// Coordinate in the unit ball
         std::vector<Edge> out; /// Outcoming edges
         std::vector<Taxi> taxis;
 
@@ -46,7 +46,8 @@ public:
 
     Node &getNode(int id);
     void input(FILE *nodeFile, FILE *edgeFile);
-    std::vector<Result> solve(int queryNodeId) const;
+    Result solve(int queryNodeId) const;
+    Result solve(double lng, double lat) const;
 
     double getMinLongitude() const { return minLongitude; }
     double getMaxLongitude() const { return maxLongitude; }
@@ -55,6 +56,7 @@ public:
 };
 
 inline Graph::Node::Node(double longitude, double latitude)
+    : lng(longitude), lat(latitude)
 {
     double phi = longitude / 180 * PI;
     double theta = (90 - latitude) / 180 * PI;

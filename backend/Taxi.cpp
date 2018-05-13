@@ -22,7 +22,7 @@ void Taxi::input(Graph &graph, FILE *f)
     puts("[DEBUG] Read taxis done");
 }
 
-void Taxi::verify(int pickNode, int dist, std::vector<Result> &results) const
+void Taxi::verify(int pickNode, int dist, std::vector<Candidate> &results) const
 {
     // TODO
 }
