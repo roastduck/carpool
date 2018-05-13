@@ -106,6 +106,8 @@ Result Graph::solve(int stId, int enId) const
     ret.dest = Point(nodes[enId].lng, nodes[enId].lat);
     ret.candidates.reserve(RESULT_NUM);
 
+    int aloneDist = path(stId, enId).dist;
+
     while (!heap.empty())
     {
         int x = heap[0].x, w = heap[0].w;
@@ -115,7 +117,7 @@ Result Graph::solve(int stId, int enId) const
 
         for (const Taxi &taxi : nodes[x].taxis)
         {
-            auto can = taxi.verify(*this, stId, enId, w);
+            auto can = taxi.verify(*this, stId, enId, w, aloneDist);
             if (can)
             {
                 Path _newPath = collectPath(trace, x);

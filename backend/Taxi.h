@@ -19,7 +19,7 @@ private:
 public:
     static void input(Graph &graph, FILE *f);
 
-    std::unique_ptr<Candidate> verify(const Graph &graph, int pickSt, int pickEn, int dist) const;
+    std::unique_ptr<Candidate> verify(const Graph &graph, int pickSt, int pickEn, int pickDist, int aloneDist) const;
 };
 
 #endif // TAXI_H_

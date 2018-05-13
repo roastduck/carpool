@@ -28,6 +28,17 @@
                             <span aria-hidden="true" ng-click="resetState()">&times;</span>
                         </button>
                         <strong>{{message[state]}}</strong>
+                        <div ng-if="state==2">
+                            <ul>
+                                <li>Passengers originally on board: <em>{{numOnBoard}}</em></li>
+                                <li ng-if="numOnBoard>0">Original passengers' distance: <em>{{oldDist}}m</em></li>
+                                <li>Pick-up distance: <em>{{pickDist}}m</em></li>
+                                <li>After-pick-up distance: <em>{{afterDist}}m</em></li>
+                                <li>Distance directly to our destination: <em>{{aloneDist}}m</em></li>
+                                <li>Our detour: <em>+{{ourDetour}}m</em></li>
+                                <li ng-if="numOnBoard>0">Original passengers' detour: <em>+{{theirDetour}}m</em></li>
+                            <ul>
+                        </div>
                     </div>
                 </div>
             <div>

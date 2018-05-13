@@ -68,7 +68,7 @@ Path Taxi::findShortest(const std::vector<Path> &begin, const std::vector<std::v
     return ret;
 }
 
-std::unique_ptr<Candidate> Taxi::verify(const Graph &graph, int pickSt, int pickEn, int dist) const
+std::unique_ptr<Candidate> Taxi::verify(const Graph &graph, int pickSt, int pickEn, int pickDist, int aloneDist) const
 {
     const int k = targets.size();
     std::vector<Path> oldBegin, newBegin;
@@ -91,9 +91,17 @@ std::unique_ptr<Candidate> Taxi::verify(const Graph &graph, int pickSt, int pick
         can->targets.push_back(Point(graph.getNode(t).lng, graph.getNode(t).lat));
     if (k > 0)
         can->oldPath = findShortest(oldBegin, paths);
+    else
+        can->oldPath.dist = 0;
     can->newPath = findShortest(newBegin, paths);
 
-    // TODO: Verify restrictions
+    double detour1 = k > 0 ? pickDist + can->newPath.dist - can->oldPath.dist : 0;
+    double detour2 = can->newPath.dist - aloneDist;
+    if (detour1 > DIST_THRES || detour2 > DIST_THRES)
+        return nullptr;
+    can->pickDist = pickDist;
+    can->aloneDist = aloneDist;
+    can->numOnBoard = k;
 
     return can;
 }

@@ -103,10 +103,13 @@ namespace ex
         for (int i = 0; i < int(res.candidates.size()); i++)
         {
             Local<Object> can = Object::New(isolate);
+            can->Set(String::NewFromUtf8(isolate, "numOnBoard"), Number::New(isolate, res.candidates[i].numOnBoard));
             can->Set(String::NewFromUtf8(isolate, "taxi"), getPoint(isolate, res.candidates[i].taxi));
             can->Set(String::NewFromUtf8(isolate, "targets"), getPoints(isolate, res.candidates[i].targets));
             can->Set(String::NewFromUtf8(isolate, "oldPath"), getPath(isolate, res.candidates[i].oldPath));
             can->Set(String::NewFromUtf8(isolate, "newPath"), getPath(isolate, res.candidates[i].newPath));
+            can->Set(String::NewFromUtf8(isolate, "pickDist"), Number::New(isolate, res.candidates[i].pickDist));
+            can->Set(String::NewFromUtf8(isolate, "aloneDist"), Number::New(isolate, res.candidates[i].aloneDist));
             candidates->Set(i, can);
         }
         ret->Set(String::NewFromUtf8(isolate, "candidates"), candidates);

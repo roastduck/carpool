@@ -27,6 +27,7 @@ struct Candidate
     Point taxi;
     std::vector<Point> targets;
     Path oldPath, newPath;
+    int pickDist, aloneDist, numOnBoard;
 };
 
 struct Result

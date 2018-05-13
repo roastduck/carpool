@@ -37,7 +37,9 @@ angular.module('appIndex', [])
         $scope.resetState = () => {
             map.clearOverlays();
             $scope.state = INIT;
+            $scope.statReady = false;
         };
+        $scope.resetState();
 
         const minLng = backend.getMinLongitude();
         const maxLng = backend.getMaxLongitude();
@@ -71,6 +73,15 @@ angular.module('appIndex', [])
                         msgs.push("Taxi " + i);
                         onClick.push(() => {
                             addMarks(pts.concat(can.targets), msgs, onClick, can.newPath.pts, can.oldPath.pts);
+                            $scope.statReady = true;
+                            $scope.numOnBoard = can.numOnBoard;
+                            $scope.oldDist = can.oldPath.dist;
+                            $scope.pickDist = can.pickDist;
+                            $scope.afterDist = can.newPath.dist - can.pickDist;
+                            $scope.aloneDist = can.aloneDist;
+                            $scope.ourDetour = $scope.afterDist - can.aloneDist;
+                            $scope.theirDetour = can.newPath.dist - can.oldPath.dist;
+                            $scope.$apply();
                         });
                     })(result.candidates[i]);
 
