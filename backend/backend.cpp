@@ -3,7 +3,6 @@
 #include "Taxi.h"
 #include "Graph.h"
 #include "Result.h"
-#include "Convert.h"
 
 const char *NODE_FILE = "data/road.cnode";
 const char *EDGE_FILE = "data/road.nedge";
@@ -61,11 +60,8 @@ namespace ex
             return;
         Isolate* isolate = args.GetIsolate();
 
-        double gcjLng = args[0]->NumberValue(), gcjLat = args[1]->NumberValue();
-        printf("[DEBUG] Query GCJ coordinate (%f, %f)\n", gcjLng, gcjLat);
-        double lng, lat;
-        Convert::decode(gcjLng, gcjLat, lng, lat);
-        printf("[DEBUG] Query true coordinate (%f, %f)\n", lng, lat);
+        double lng = args[0]->NumberValue(), lat = args[1]->NumberValue();
+        printf("[DEBUG] Query GCJ coordinate (%f, %f)\n", lng, lat);
 
         Result res = graph.solve(lng, lat);
         Local<Object> ret = Object::New(isolate);

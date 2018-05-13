@@ -6,13 +6,13 @@ const apiKey = require("./api-key.js");
 angular.module('appIndex', [])
     .controller('IndexController', ['$scope', ($scope) => {
         const convertor = new BMap.Convertor();
-        const TRUE_COORD = 1, GCJ_COORD = 3, BD_COORD = 5;
+        const GCJ_COORD = 3, BD_COORD = 5;
         function getPoints(arr, callback) {
             const pts = [];
             for (var i in arr) {
                 pts.push(new BMap.Point(arr[i].x, arr[i].y));
             }
-            convertor.translate(pts, TRUE_COORD, BD_COORD, (pts) => {
+            convertor.translate(pts, GCJ_COORD, BD_COORD, (pts) => {
                 if (pts.status == 0)
                     callback(pts.points);
                 else
