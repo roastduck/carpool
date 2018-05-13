@@ -25,6 +25,7 @@ namespace ex
     using v8::Value;
     using v8::Number;
     using v8::Exception;
+    using v8::Array;
 
     Graph graph;
 
@@ -65,9 +66,19 @@ namespace ex
         printf("[DEBUG] Query GCJ coordinate (%f, %f) -> (%f, %f)\n", lngSt, latSt, lngEn, latEn);
 
         Result res = graph.solve(lngSt, latSt, lngEn, latEn);
+        puts("[DEBUG] Query returns");
+
         Local<Object> ret = Object::New(isolate);
         ret->Set(String::NewFromUtf8(isolate, "depart"), getPoint(isolate, res.depart));
         ret->Set(String::NewFromUtf8(isolate, "dest"), getPoint(isolate, res.dest));
+        Local<Array> candidates = Array::New(isolate, res.candidates.size());
+        for (int i = 0; i < int(res.candidates.size()); i++)
+        {
+            Local<Object> can = Object::New(isolate);
+            can->Set(String::NewFromUtf8(isolate, "taxi"), getPoint(isolate, res.candidates[i].taxi));
+            candidates->Set(i, can);
+        }
+        ret->Set(String::NewFromUtf8(isolate, "candidates"), candidates);
 
         args.GetReturnValue().Set(ret);
     }

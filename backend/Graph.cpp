@@ -56,7 +56,7 @@ Result Graph::solve(int stId, int enId) const
 {
     printf("[DEBUG] Query node %d (%f, %f)\n", stId, nodes[stId].lng, nodes[stId].lat);
 
-    // Dijkstra, because we want nearer node to come out sooner
+    // Dijkstra, because we want nearer nodes to come out sooner
 
     std::vector<Weighted> heap;
     heap.reserve(nodes.size());
@@ -80,14 +80,15 @@ Result Graph::solve(int stId, int enId) const
 
         for (const Taxi &taxi : nodes[x].taxis)
         {
-            taxi.verify(x, w, ret.candidates);
+            taxi.verify(*this, x, w, ret.candidates);
             if (ret.candidates.size() >= RESULT_NUM)
                 return ret;
         }
 
         for (const Edge &e : nodes[x].out)
-            if (w + e.d < !trace[e.y].dist)
+            if (w + e.d < trace[e.y].dist)
             {
+                trace[e.y] = (Trace){w + e.d, x};
                 heap.push_back((Weighted){w + e.d, e.y});
                 std::push_heap(heap.begin(), heap.end(), heapCmp);
             }

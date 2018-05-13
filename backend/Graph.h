@@ -46,7 +46,8 @@ private:
 public:
     Graph();
 
-    Node &getNode(int id);
+    Node &getNode(int id) { return nodes[id]; }
+    const Node &getNode(int id) const { return nodes[id]; }
     void input(FILE *nodeFile, FILE *edgeFile);
     Result solve(int stId, int enId) const;
     Result solve(double lngSt, double latSt, double lngEn, double latEn) const;
@@ -70,11 +71,6 @@ inline Graph::Node::Node(double longitude, double latitude)
 inline double Graph::directDist(const Node &a, const Node &b)
 {
     return acos(a.x * b.x + a.y * b.y + a.z * b.z) * EARTH_RADIUS;
-}
-
-inline Graph::Node &Graph::getNode(int id)
-{
-    return nodes[id];
 }
 
 #endif // GRAPH_H_

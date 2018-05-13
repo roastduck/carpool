@@ -67,12 +67,20 @@ angular.module('appIndex', [])
                             console.log("Error: Cannot convert coordinate (Baidu -> GCJ)");
                             return;
                         }
+
                         const result = backend.query(
                             pts.points[0].lng, pts.points[0].lat,
                             pts.points[1].lng, pts.points[1].lat
                         );
+                        pts = [result.depart, result.dest];
+                        const msgs = ["From", "To"];
+                        for (var i in result.candidates) {
+                            pts.push(result.candidates[i].taxi);
+                            msgs.push("Taxi " + i);
+                        }
+
                         map.clearOverlays();
-                        addMarks([result.depart, result.dest], ["From", "To"], () => {
+                        addMarks(pts, msgs, () => {
                             $scope.state = INIT;
                             $scope.$apply();
                         });

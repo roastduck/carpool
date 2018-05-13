@@ -22,8 +22,12 @@ void Taxi::input(Graph &graph, FILE *f)
     puts("[DEBUG] Read taxis done");
 }
 
-void Taxi::verify(int pickNode, int dist, std::vector<Candidate> &results) const
+void Taxi::verify(const Graph &graph, int pickNode, int dist, std::vector<Candidate> &candidates) const
 {
     // TODO
+    Candidate can;
+    can.taxi = (Point){graph.getNode(pickNode).lng, graph.getNode(pickNode).lat};
+    candidates.push_back(std::move(can));
+    puts("[DEBUG] Added a candidate");
 }
 
