@@ -1,7 +1,12 @@
 <html ng-app="appIndex">
     <head>
+        <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
         <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css" />
 		<script>
+            document.write("<script src=\"http://api.map.baidu.com/api?v=3.0&ak=" + require("./api-key.js") + "\"><\/script>");
+        </script>
+        <script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
+        <script>
             window.$ = window.jQuery = require('../node_modules/jquery/dist/jquery.min.js');
             require('../node_modules/bootstrap/dist/js/bootstrap.min.js');
             require('../node_modules/angular/angular.min.js');
@@ -11,8 +16,8 @@
     <body ng-controller="IndexController" style='overflow:hidden'>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-xs-12 well">
-                    <img style="width:100%" ng-attr-src="{{mapUrl}}" />
+                <div class="col-xs-12 well" style="height:75%">
+                    <div id="map" style="height:100%"></div>
                 </div>
             <div>
         </div>
