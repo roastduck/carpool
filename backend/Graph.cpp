@@ -1,3 +1,4 @@
+#include <cassert>
 #include <algorithm>
 #include "Graph.h"
 
@@ -52,6 +53,40 @@ void Graph::input(FILE *nodeFile, FILE *edgeFile)
 struct Weighted { int w, x; };
 static bool heapCmp(const Weighted &lhs, const Weighted &rhs) { return lhs.w > rhs.w; }
 
+Path Graph::path(int stId, int enId) const
+{
+    // A* Dijkstra
+
+    std::vector<Weighted> heap;
+    heap.reserve(nodes.size());
+    heap.push_back((Weighted){(int)ceil(directDist(nodes[enId], nodes[stId])), enId});
+
+    std::vector<Trace> trace;
+    trace.resize(nodes.size(), (Trace){0x7fffffff, -1});
+    trace[enId].dist = 0;
+
+    while (!heap.empty())
+    {
+        int x = heap[0].x, w = trace[x].dist, _w = heap[0].w;
+        std::pop_heap(heap.begin(), heap.end(), heapCmp);
+        heap.pop_back();
+        if (trace[x].dist + (int)ceil(directDist(nodes[x], nodes[stId])) != _w)
+            continue;
+
+        if (x == stId)
+            return collectPath(trace, x);
+
+        for (const Edge &e : nodes[x].out)
+            if (w + e.d < trace[e.y].dist)
+            {
+                trace[e.y] = (Trace){w + e.d, x};
+                heap.push_back((Weighted){w + e.d + (int)ceil(directDist(nodes[e.y], nodes[stId])), e.y});
+                std::push_heap(heap.begin(), heap.end(), heapCmp);
+            }
+    }
+    assert(false);
+}
+
 Result Graph::solve(int stId, int enId) const
 {
     printf("[DEBUG] Query node %d (%f, %f)\n", stId, nodes[stId].lng, nodes[stId].lat);
@@ -80,9 +115,20 @@ Result Graph::solve(int stId, int enId) const
 
         for (const Taxi &taxi : nodes[x].taxis)
         {
-            taxi.verify(*this, x, w, ret.candidates);
-            if (ret.candidates.size() >= RESULT_NUM)
-                return ret;
+            auto can = taxi.verify(*this, stId, enId, w);
+            if (can)
+            {
+                Path _newPath = collectPath(trace, x);
+                _newPath.dist += can->newPath.dist;
+                for (const Point &p : can->newPath.pts)
+                    if (_newPath.pts.back() != p)
+                        _newPath.pts.push_back(p);
+                can->newPath = std::move(_newPath);
+
+                ret.candidates.push_back(std::move(*can));
+                if (ret.candidates.size() >= RESULT_NUM)
+                    return ret;
+            }
         }
 
         for (const Edge &e : nodes[x].out)
@@ -100,5 +146,14 @@ Result Graph::solve(int stId, int enId) const
 Result Graph::solve(double lngSt, double latSt, double lngEn, double latEn) const
 {
     return solve(nearestNode(lngSt, latSt), nearestNode(lngEn, latEn));
+}
+
+Path Graph::collectPath(const std::vector<Trace> &trace, int dest) const
+{
+    Path path;
+    path.dist = trace[dest].dist;
+    for (int x = dest; x != -1; x = trace[x].last)
+        path.pts.push_back((Point){nodes[x].lng, nodes[x].lat});
+    return path;
 }
 

@@ -10,7 +10,11 @@ struct Point
     double x, y;
 };
 
-typedef std::vector<Point> Path;
+struct Path
+{
+    int dist;
+    std::vector<Point> pts;
+};
 
 struct Candidate
 {
@@ -24,6 +28,16 @@ struct Result
     Point depart, dest;
     std::vector<Candidate> candidates;
 };
+
+inline bool operator==(const Point &lhs, const Point &rhs)
+{
+    return lhs.x == rhs.x && lhs.y == rhs.y;
+}
+
+inline bool operator!=(const Point &lhs, const Point &rhs)
+{
+    return lhs.x != rhs.x || lhs.y != rhs.y;
+}
 
 #endif // RESULT_H_
 

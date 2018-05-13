@@ -7,39 +7,63 @@ angular.module('appIndex', [])
     .controller('IndexController', ['$scope', ($scope) => {
         const convertor = new BMap.Convertor();
         const GCJ_COORD = 3, BD_COORD = 5;
-        function getPoints(arr, callback) {
-            const pts = [];
-            for (var i in arr) {
-                pts.push(new BMap.Point(arr[i].x, arr[i].y));
+        const MAX_BATCH = 10;
+        function getPoints(arrReq, callback, arrResp = []) {
+            if (arrReq.length == 0) {
+                callback(arrResp);
+                return;
             }
-            convertor.translate(pts, GCJ_COORD, BD_COORD, (pts) => {
-                if (pts.status == 0)
-                    callback(pts.points);
-                else
-                    console.log("Error: Cannot convert coordinate (True -> Baidu)");
-            });
+            convertor.translate(
+                arrReq.slice(0, MAX_BATCH).map((pt) => {return new BMap.Point(pt.x, pt.y);}),
+                GCJ_COORD,
+                BD_COORD,
+                (pts) => {
+                    if (pts.status == 0)
+                        getPoints(arrReq.slice(MAX_BATCH), callback, arrResp.concat(pts.points));
+                    else
+                        console.log("Error: Cannot convert coordinate (GCJ -> Baidu)");
+                }
+            );
         }
 
         const map = new BMap.Map("map");
 
-        function addMarks(_pts, msgs, callback) {
-            getPoints(_pts, (pts) => {
+        function addMarks(_pts, msgs, onClick, _newLine, _oldLine, callback) {
+            const _allPts = _pts.concat(_newLine, _oldLine);
+            getPoints(_allPts, (allPts) => {
+                const pts = allPts.slice(0, _pts.length);
+                const newLine = allPts.slice(_pts.length, _pts.length + _newLine.length);
+                const oldLine = allPts.slice(_pts.length + _newLine.length);
+
+                map.clearOverlays();
                 for (var i in pts) {
                     const mark = new BMap.Marker(pts[i]);
                     map.addOverlay(mark);
-                    if (i < msgs.length)
+                    if (msgs[i])
                         mark.setLabel(new BMap.Label(msgs[i], {offset: new BMap.Size(20, -10)}));
+                    if (onClick[i])
+                        mark.addEventListener("click", onClick[i]);
                 }
+                if (newLine)
+                    map.addOverlay(new BMap.Polyline(newLine, {strokeColor: "red", strokeOpacity: 0.7}));
+                if (oldLine)
+                    map.addOverlay(new BMap.Polyline(oldLine, {strokeColor: "blue", strokeOpacity: 0.3}));
+
                 callback();
             });
         }
 
-        const INIT = 0, EXT = 1;
+        const INIT = 0, EXT = 1, FIN = 2;
         $scope.state = INIT;
         $scope.message = [
             "Click on the map for departure point",
-            "Click on the map for destination point"
+            "Click on the map for destination point",
+            "Click on the taxi marks for details"
         ];
+        $scope.resetState = () => {
+            map.clearOverlays();
+            $scope.state = INIT;
+        };
 
         const minLng = backend.getMinLongitude();
         const maxLng = backend.getMaxLongitude();
@@ -74,17 +98,23 @@ angular.module('appIndex', [])
                         );
                         pts = [result.depart, result.dest];
                         const msgs = ["From", "To"];
-                        for (var i in result.candidates) {
-                            pts.push(result.candidates[i].taxi);
-                            msgs.push("Taxi " + i);
-                        }
+                        const onClick = [null, null];
+                        for (var i in result.candidates)
+                            ((can) => {
+                                pts.push(can.taxi);
+                                msgs.push("Taxi " + i);
+                                onClick.push(() => {
+                                    addMarks(pts.concat(can.targets), msgs, onClick, can.newPath.pts, can.oldPath.pts, () => {});
+                                });
+                            })(result.candidates[i]);
 
-                        map.clearOverlays();
-                        addMarks(pts, msgs, () => {
-                            $scope.state = INIT;
+                        addMarks(pts, msgs, onClick, [], [], () => {
+                            $scope.state = FIN;
                             $scope.$apply();
                         });
                     });
+                    break;
+                case FIN:
                     break;
                 default:
                     console.log("Error: Invalid state");

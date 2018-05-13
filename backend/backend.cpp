@@ -42,11 +42,27 @@ namespace ex
         return true;
     }
 
-    Local<Object> getPoint(Isolate *isolate, const Point &ptr)
+    Local<Object> getPoint(Isolate *isolate, const Point &pt)
     {
         Local<Object> obj = Object::New(isolate);
-        obj->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, ptr.x));
-        obj->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, ptr.y));
+        obj->Set(String::NewFromUtf8(isolate, "x"), Number::New(isolate, pt.x));
+        obj->Set(String::NewFromUtf8(isolate, "y"), Number::New(isolate, pt.y));
+        return obj;
+    }
+
+    Local<Array> getPoints(Isolate *isolate, const std::vector<Point> &pts)
+    {
+        Local<Array> arr = Array::New(isolate, pts.size());
+        for (int i = 0; i < int(pts.size()); i++)
+            arr->Set(i, getPoint(isolate, pts[i]));
+        return arr;
+    }
+
+    Local<Object> getPath(Isolate *isolate, const Path &path)
+    {
+        Local<Object> obj = Object::New(isolate);
+        obj->Set(String::NewFromUtf8(isolate, "dist"), Number::New(isolate, path.dist));
+        obj->Set(String::NewFromUtf8(isolate, "pts"), getPoints(isolate, path.pts));
         return obj;
     }
 
@@ -76,6 +92,9 @@ namespace ex
         {
             Local<Object> can = Object::New(isolate);
             can->Set(String::NewFromUtf8(isolate, "taxi"), getPoint(isolate, res.candidates[i].taxi));
+            can->Set(String::NewFromUtf8(isolate, "targets"), getPoints(isolate, res.candidates[i].targets));
+            can->Set(String::NewFromUtf8(isolate, "oldPath"), getPath(isolate, res.candidates[i].oldPath));
+            can->Set(String::NewFromUtf8(isolate, "newPath"), getPath(isolate, res.candidates[i].newPath));
             candidates->Set(i, can);
         }
         ret->Set(String::NewFromUtf8(isolate, "candidates"), candidates);

@@ -40,6 +40,7 @@ private:
     double minLongitude, maxLongitude, minLatitude, maxLatitude;
 
     int nearestNode(double lng, double lat) const;
+    Path collectPath(const std::vector<Trace> &trace, int dest) const;
 
     static double directDist(const Node &a, const Node &b);
 
@@ -49,6 +50,7 @@ public:
     Node &getNode(int id) { return nodes[id]; }
     const Node &getNode(int id) const { return nodes[id]; }
     void input(FILE *nodeFile, FILE *edgeFile);
+    Path path(int stId, int enId) const;
     Result solve(int stId, int enId) const;
     Result solve(double lngSt, double latSt, double lngEn, double latEn) const;
 
