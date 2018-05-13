@@ -7,7 +7,6 @@
 #include "Taxi.h"
 #include "Result.h"
 
-const double PI = acos(-1);
 const double EARTH_RADIUS = 63710000;
 const int DIST_THRES = 10000;
 

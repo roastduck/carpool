@@ -1,13 +1,19 @@
 #ifndef RESULT_H_
 #define RESULT_H_
 
+#include <cmath>
 #include <vector>
 
 const int RESULT_NUM = 5;
 
+const double PI = acos(-1);
+const double X_PI = PI * 3000.0 / 180.0;
+
 struct Point
 {
     double x, y;
+    Point() {}
+    Point(double _x, double _y);
 };
 
 struct Path

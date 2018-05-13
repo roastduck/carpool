@@ -102,8 +102,8 @@ Result Graph::solve(int stId, int enId) const
     trace[stId].dist = 0;
 
     Result ret;
-    ret.depart = (Point){nodes[stId].lng, nodes[stId].lat};
-    ret.dest = (Point){nodes[enId].lng, nodes[enId].lat};
+    ret.depart = Point(nodes[stId].lng, nodes[stId].lat);
+    ret.dest = Point(nodes[enId].lng, nodes[enId].lat);
     ret.candidates.reserve(RESULT_NUM);
 
     while (!heap.empty())
@@ -153,7 +153,7 @@ Path Graph::collectPath(const std::vector<Trace> &trace, int dest) const
     Path path;
     path.dist = trace[dest].dist;
     for (int x = dest; x != -1; x = trace[x].last)
-        path.pts.push_back((Point){nodes[x].lng, nodes[x].lat});
+        path.pts.push_back(Point(nodes[x].lng, nodes[x].lat));
     return path;
 }
 

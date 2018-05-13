@@ -85,10 +85,10 @@ std::unique_ptr<Candidate> Taxi::verify(const Graph &graph, int pickSt, int pick
     }
 
     std::unique_ptr<Candidate> can(new Candidate());
-    can->taxi = (Point){graph.getNode(at).lng, graph.getNode(at).lat};
+    can->taxi = Point(graph.getNode(at).lng, graph.getNode(at).lat);
     can->targets.reserve(targets.size());
     for (int t : targets)
-        can->targets.push_back((Point){graph.getNode(t).lng, graph.getNode(t).lat});
+        can->targets.push_back(Point(graph.getNode(t).lng, graph.getNode(t).lat));
     if (k > 0)
         can->oldPath = findShortest(oldBegin, paths);
     can->newPath = findShortest(newBegin, paths);

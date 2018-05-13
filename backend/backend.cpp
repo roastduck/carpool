@@ -29,6 +29,15 @@ namespace ex
 
     Graph graph;
 
+    void bdDecrypt(double bd_lon, double bd_lat, double &gg_lon, double &gg_lat)
+    {
+        double x = bd_lon - 0.0065, y = bd_lat - 0.006;
+        double z = sqrt(x * x + y * y) - 0.00002 * sin(y * X_PI);
+        double theta = atan2(y, x) - 0.000003 * cos(x * X_PI);
+        gg_lon = z * cos(theta);
+        gg_lat = z * sin(theta);
+    }
+
     bool checkArgs(const FunctionCallbackInfo<Value> &args, int num)
     {
         Isolate* isolate = args.GetIsolate();
@@ -77,8 +86,11 @@ namespace ex
             return;
         Isolate* isolate = args.GetIsolate();
 
-        double lngSt = args[0]->NumberValue(), latSt = args[1]->NumberValue();
-        double lngEn = args[2]->NumberValue(), latEn = args[3]->NumberValue();
+        double lngStBd = args[0]->NumberValue(), latStBd = args[1]->NumberValue();
+        double lngEnBd = args[2]->NumberValue(), latEnBd = args[3]->NumberValue();
+        double lngSt, latSt, lngEn, latEn;
+        bdDecrypt(lngStBd, latStBd, lngSt, latSt);
+        bdDecrypt(lngEnBd, latEnBd, lngEn, latEn);
         printf("[DEBUG] Query GCJ coordinate (%f, %f) -> (%f, %f)\n", lngSt, latSt, lngEn, latEn);
 
         Result res = graph.solve(lngSt, latSt, lngEn, latEn);
